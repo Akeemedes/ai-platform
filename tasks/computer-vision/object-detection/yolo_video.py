@@ -60,7 +60,7 @@ def process_video(keras_model_path='models/yolov3-spp.h5', size = 320, dataset =
         #        # suppress non-maximal boxes
                 do_nms(boxes, 0.5)
         #        # define the labels
-                _,labels = dataset_process(r"C:\Users\LEGION\YOLO\data\coco.data")
+                _,labels = dataset_process(dataset)
         #        
                 v_boxes, v_labels, v_scores = get_boxes(boxes, labels, class_threshold)
                 for i in range(len(v_boxes)):
