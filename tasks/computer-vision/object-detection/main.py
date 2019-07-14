@@ -6,8 +6,7 @@ Edited from the ai-platform object detection. Allows for image, video and passin
 """
 
 import sys
-
-
+import os
 import mlflow
 from mlflow.utils import mlflow_tags
 from mlflow.entities import RunStatus
@@ -62,7 +61,7 @@ def _get_or_run(entrypoint, parameters, git_commit, use_cache=True):
         return existing_run
     print("Launching new run for entrypoint=%s and parameters=%s" %
           (entrypoint, parameters))
-    submitted_run = mlflow.run(".", entrypoint, parameters=parameters)
+    submitted_run = mlflow.run(".", entrypoint, parameters=parameters, use_conda=False)
     return mlflow.tracking.MlflowClient().get_run(submitted_run.run_id)
 
 
@@ -79,6 +78,9 @@ def workflow(**parameters):
 
 
 if __name__ == '__main__':
+    
+    if not os.path.exists("models"): os.mkdir("models")
+    if not os.path.exists("outputs"): os.mkdir("outputs")
     if sys.argv[4] =="None":
         appendfunc = lambda spp, dataset: "-spp" if spp and dataset =="coco" else "" if dataset == "coco" else "-{}".format(dataset)
         sys.argv[4] = 'models/yolov3{}.h5'.format(appendfunc(int(sys.argv[3]), sys.argv[2]))
