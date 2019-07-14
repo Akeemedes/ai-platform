@@ -199,7 +199,8 @@ def cvDrawBoxes(img, v_boxes, v_labels, v_scores):
         
 
 
-def process_image(keras_model_path, size,dataset = "data\coco.data", photo_name = "data/horses.jpg"):
+def process_image(keras_model_path, size,dataset = "coco", photo_name = "data/horses.jpg"):
+    dataset = "data/{}.data".format(dataset)
     if not os.path.exists("outputs"): os.mkdir("outputs")
     
     warnings.filterwarnings("ignore")
@@ -218,7 +219,7 @@ def process_image(keras_model_path, size,dataset = "data\coco.data", photo_name 
     # define the anchors
     anchors = [[116,90, 156,198, 373,326], [30,61, 62,45, 59,119], [10,13, 16,30, 33,23]]
     # define the probability threshold for detected objects
-    class_threshold = 0.6
+    class_threshold = 0.5
     boxes = list()
     for i in range(len(yhat)):
         # decode the output of the network
@@ -226,10 +227,9 @@ def process_image(keras_model_path, size,dataset = "data\coco.data", photo_name 
     # correct the sizes of the bounding boxes for the shape of the image
     correct_yolo_boxes(boxes, image_h, image_w, input_h, input_w)
     # suppress non-maximal boxes
-    do_nms(boxes, 0.5)
+    do_nms(boxes, 0.4)
     # define the labels
     _,labels = dataset_process(dataset) 
-    
     with mlflow.start_run(nested = True):
         mlflow.log_param("keras_model_path", keras_model_path)
         mlflow.log_param("photo_name", photo_name)
@@ -249,5 +249,5 @@ def process_image(keras_model_path, size,dataset = "data\coco.data", photo_name 
 
 
 if __name__ == "__main__":
-    process_image('models/yolov3-spp.h5', 608)
+    process_image('models/yolov3-spp.h5', 608, "coco")
     

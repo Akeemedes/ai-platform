@@ -5,19 +5,19 @@ conda_env: conda.yaml
 entry_points:
   yolov3_weights_to_keras:
     parameters:
-      darknet_model_path: {type: string, default: 'models/yolov3-spp.weights'}
-      dataset: {type: string, default: 'data/coco.data'}
-      SPP: {type: float, default: 1}
+      darknet_model_path: {type: string, default: 'None'}
+      dataset: {type: string, default: 'coco'}
+      SPP: {type: float, default: 0}
       kerasPath: {type: string, default: 'None'}
-      darknet_url: {type: string, default: 'https://pjreddie.com/media/files/yolov3-spp.weights'}
+      darknet_url: {type: string, default: 'None'}
     command: "python yolov3_weights_to_keras.py {darknet_model_path} {dataset} {SPP} {kerasPath}" 
 
   detector:
     parameters:
       mode: {type: string, default: 'image'}
-      keras_model_path: {type: string, default: 'models/yolov3-spp.h5'}
+      keras_model_path: {type: string, default: 'None'}
       size: {type: float, default: 416}
-      dataset: {type: string, default: 'data/coco.data'}
+      dataset: {type: string, default: 'coco'}
       file_name: {type: string, default: 'data/horses.jpg'}
       
       
@@ -25,11 +25,11 @@ entry_points:
 
   main:
     parameters:
-      darknet_model_path: {type: string, default: 'models/yolov3-spp.weights'}
-      dataset: {type: string, default: 'data/coco.data'}
-      SPP: {type: float, default: 1}
-      keras_model_path: {type: string, default: 'models/yolov3-spp.h5'}
-      darknet_url: {type: string, default: 'https://pjreddie.com/media/files/yolov3-spp.weights'}
+      darknet_model_path: {type: string, default: 'None'}
+      dataset: {type: string, default: 'coco'}
+      SPP: {type: float, default: 0}
+      keras_model_path: {type: string, default: 'None'}
+      darknet_url: {type: string, default: 'None'}
       mode: {type: string, default: 'image'}
       size: {type: float, default: 416}
       file_name: {type: string, default: 'data/horses.jpg'}

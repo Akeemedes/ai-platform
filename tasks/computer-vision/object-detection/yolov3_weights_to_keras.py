@@ -236,18 +236,25 @@ def dataset_process(data_path):
 
 class YOLO:
     
-    def __init__(self, data = "data/coco.DATA", SPP = True):
-        self.num_classes, self.classes = dataset_process(data)
-        self.SPP = SPP
-        self.model = make_yolo(self.num_classes, SPP)
-        print(self.model.summary())
+    def __init__(self, dataset = "openimages", SPP = False):
+        if SPP and dataset != "coco":
+            print("SPP weights only exist for coco dataset. Reverting to ordinary yolov3...")
+        self.SPP = SPP if dataset =="coco" else False
+        appendfunc = lambda spp, dataset: "-spp" if spp else "" if dataset == "coco" else "-{}".format(dataset)
+        self.data = 'data/{}.data'.format(dataset)
+        self.url = 'https://pjreddie.com/media/files/yolov3{}.weights'.format(appendfunc(self.SPP, dataset))
+        self.darknet_model_path = 'models/yolov3{}.weights'.format(appendfunc(self.SPP, dataset))
+        self.kerasPath = 'models/yolov3{}.h5'.format(appendfunc(self.SPP, dataset))
+        self.num_classes, self.classes = dataset_process(self.data)
+        self.model = make_yolo(self.num_classes, self.SPP)
+        #print(self.model.summary())
         
-    def load_darknet_weights(self, weightPath, kerasPath = None):
+    def load_darknet_weights(self, darknet_model_path = None, kerasPath = None):
         
-        if kerasPath == None: 
-            kerasPath = "models/yolov3-spp.h5" if self.SPP else "models/yolov3.h5"
+        if kerasPath == None: kerasPath = self.kerasPath
+        if darknet_model_path == None : darknet_model_path = self.darknet_model_path
         if not os.path.exists(kerasPath):
-            weight_reader = WeightReader(weightPath)
+            weight_reader = WeightReader(darknet_model_path)
             weight_reader.load_weights(self.model, self.SPP)
             self.model.save(kerasPath)
             print("Model saved at: {}".format(kerasPath))
@@ -255,29 +262,32 @@ class YOLO:
             print("Model already exists")
             self.load_model(kerasPath)
             
-            
+    def download_weights(self, darknet_model_path, url):
+        if darknet_model_path ==None: darknet_model_path = self.darknet_model_path
+        url = url if url else self.url
+        download_if_not_exists(darknet_model_path, url)
+        
         
     def load_model(self, model_path):
         self.model.load_weights(model_path)
         print("Model loaded from: {}".format(model_path))
         
 if __name__ =="__main__":
-    url = sys.argv[5] if len(sys.argv)>5 else 'https://pjreddie.com/media/files/yolov3-spp.weights'
-    darknet_model_path = sys.argv[1] if len(sys.argv)>1 else 'models/yolov3-spp.weights'
-    download_if_not_exists(darknet_model_path, url)
-    dataset = sys.argv[2] if len(sys.argv)>2 else 'data/coco.data'
-    SPP = sys.argv[3] if len(sys.argv)>3 else 1
+    url = sys.argv[5] if len(sys.argv)>5 and sys.argv[5]!="None" else None
+    darknet_model_path = sys.argv[1] if len(sys.argv)>1 and sys.argv[1]!="None" else None
+    dataset = sys.argv[2] if len(sys.argv)>2 else 'openimages'
+    SPP = int(sys.argv[3]) if len(sys.argv)>3 else 1
+    print("SPP use: ", int(sys.argv[3]))
     kerasPath = sys.argv[4] if len(sys.argv)>4 and sys.argv[4] !="None" else None
-
-    
     yolo = YOLO(dataset, SPP)
+    yolo.download_weights(darknet_model_path, url)
     yolo.load_darknet_weights(darknet_model_path, kerasPath)
     
     
     with mlflow.start_run():
-        mlflow.log_param("darknet_model_path", darknet_model_path)
+        mlflow.log_param("darknet_model_path", yolo.darknet_model_path)
         mlflow.log_param("dataset", dataset)
-        mlflow.log_param("SPP", SPP)
-        mlflow.log_param("darknet_url", url)
-        mlflow.keras.log_model(yolo.model, kerasPath)
+        mlflow.log_param("SPP", yolo.SPP)
+        mlflow.log_param("darknet_url", yolo.url)
+        mlflow.keras.log_model(yolo.model, yolo.kerasPath)
         

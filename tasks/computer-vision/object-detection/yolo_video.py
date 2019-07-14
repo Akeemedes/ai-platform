@@ -19,7 +19,8 @@ from keras.models import load_model
 
 
 
-def process_video(keras_model_path='models/yolov3-spp.h5', size = 320, dataset = "data\coco.data", video_path = "data/Working.mp4"):
+def process_video(keras_model_path='models/yolov3-spp.h5', size = 320, dataset = "coco", video_path = "data/Working.mp4"):
+    dataset = "data/{}.data".format(dataset)
     cv2.namedWindow("Demo", cv2.WINDOW_NORMAL)
     cv2.resizeWindow("Demo", 720, 1280)
     input_w, input_h = size, size

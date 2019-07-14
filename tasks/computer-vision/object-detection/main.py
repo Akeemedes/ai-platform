@@ -79,6 +79,9 @@ def workflow(**parameters):
 
 
 if __name__ == '__main__':
-    
+    if sys.argv[4] =="None":
+        appendfunc = lambda spp, dataset: "-spp" if spp and dataset =="coco" else "" if dataset == "coco" else "-{}".format(dataset)
+        sys.argv[4] = 'models/yolov3{}.h5'.format(appendfunc(int(sys.argv[3]), sys.argv[2]))
+        print("model path set to {}".format(sys.argv[4]))
     workflow(darknet_model_path = sys.argv[1], dataset = sys.argv[2], SPP = sys.argv[3], keras_model_path = sys.argv[4], mode = sys.argv[5],\
              size = sys.argv[6], file_name = sys.argv[7], darknet_url = sys.argv[8])
