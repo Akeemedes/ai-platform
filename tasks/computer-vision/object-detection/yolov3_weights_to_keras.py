@@ -277,7 +277,7 @@ if __name__ =="__main__":
     darknet_model_path = sys.argv[1] if len(sys.argv)>1 and sys.argv[1]!="None" else None
     dataset = sys.argv[2] if len(sys.argv)>2 else 'openimages'
     SPP = int(sys.argv[3]) if len(sys.argv)>3 else 1
-    print("SPP use: ", int(sys.argv[3]))
+    print("SPP use: ", SPP)
     kerasPath = sys.argv[4] if len(sys.argv)>4 and sys.argv[4] !="None" else None
     yolo = YOLO(dataset, SPP)
     yolo.download_weights(darknet_model_path, url)
