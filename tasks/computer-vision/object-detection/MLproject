@@ -10,7 +10,7 @@ entry_points:
       SPP: {type: float, default: 0}
       kerasPath: {type: string, default: 'None'}
       darknet_url: {type: string, default: 'None'}
-    command: "python yolov3_weights_to_keras.py {darknet_model_path} {dataset} {SPP} {kerasPath}" 
+    command: "python yolov3_weights_to_keras.py {darknet_model_path} {dataset} {SPP} {kerasPath} {darknet_url}" 
 
   detector:
     parameters:
